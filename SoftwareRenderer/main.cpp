@@ -166,39 +166,6 @@ int main(int argc, char* argv[]){
 
 }
 
-void createHDCfromImage(HDC &out_memory_dc) {
-	BITMAPINFOHEADER bi_header;
-	HBITMAP dib_bitmap;
-	HBITMAP old_bitmap;
-
-	memset(&bi_header, 0, sizeof(BITMAPINFOHEADER));
-	bi_header.biSize = sizeof(BITMAPINFOHEADER);
-	bi_header.biWidth = 50;
-	bi_header.biHeight = -50;  /* top-down */
-	bi_header.biPlanes = 1;
-	bi_header.biBitCount = 32;
-	bi_header.biCompression = BI_RGB;
-
-	unsigned char image[50*50*4];
-
-	for (int i = 0; i < 50 * 50; i++) {
-		image[4 * i] = (unsigned char)30;
-		image[4 * i + 1] = (unsigned char)50;
-		image[4 * i + 2] = (unsigned char)70;
-		image[4 * i + 3] = (unsigned char)200;
-	}
-
-
-	dib_bitmap = CreateDIBSection(out_memory_dc, (BITMAPINFO*)&bi_header,
-		DIB_RGB_COLORS, (void**)&image,
-		NULL, 0);
-
-	assert(dib_bitmap != NULL);
-	old_bitmap = (HBITMAP)SelectObject(out_memory_dc, dib_bitmap);
-	DeleteObject(old_bitmap);
-
-}
-
 LRESULT CALLBACK process_message(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	PAINTSTRUCT ps;
@@ -209,49 +176,6 @@ LRESULT CALLBACK process_message(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
 	{
 	case WM_PAINT: {
 		hdc = BeginPaint(hWnd, &ps);
-
-		//HDC hdcMem = CreateCompatibleDC(hdc);
-		////createHDCfromImage(hdcMem);
-
-		//BITMAPINFOHEADER bi_header;
-		//HBITMAP dib_bitmap;
-		//HBITMAP old_bitmap;
-
-		//memset(&bi_header, 0, sizeof(BITMAPINFOHEADER));
-		//bi_header.biSize = sizeof(BITMAPINFOHEADER);
-		//bi_header.biWidth = 50;
-		//bi_header.biHeight = -50;  /* top-down */
-		//bi_header.biPlanes = 1;
-		//bi_header.biBitCount = 32;
-		//bi_header.biCompression = BI_RGB;
-
-		//unsigned char image[50 * 50 * 4];
-
-		//for (int i = 0; i < 50 * 50; i++) {
-		//	image[4 * i] = (unsigned char)30;
-		//	image[4 * i + 1] = (unsigned char)50;
-		//	image[4 * i + 2] = (unsigned char)70;
-		//	image[4 * i + 3] = (unsigned char)200;
-		//}
-
-		//dib_bitmap = CreateDIBSection(hdcMem, (BITMAPINFO*)&bi_header,
-		//	DIB_RGB_COLORS, (void**)&image,
-		//	NULL, 0);
-
-		//assert(dib_bitmap != NULL);
-		//old_bitmap = (HBITMAP)SelectObject(hdcMem, dib_bitmap);
-		//DeleteObject(old_bitmap);
-
-
-		//BitBlt(hdc, 0, 0, 50, 50, hdcMem, 0, 0, SRCCOPY);
-		//DeleteDC(hdcMem);
-
-		////TextOut(hdc,
-		////	5, 5,
-		////	greeting, _tcslen(greeting));
-
-
-
 		EndPaint(hWnd, &ps);
 		break;
 	}
