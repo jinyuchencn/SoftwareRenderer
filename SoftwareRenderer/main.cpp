@@ -63,7 +63,7 @@ HWND createWindow(const std::string title,int WIDTH,int HEIGHT) {
 	return handle;
 }
 
-void createCanvas(HWND handle, int width, int height, std::vector<unsigned char> &image, HDC &memoryDC)
+void createCanvas(HWND handle, int width, int height, byte** image, HDC &memoryDC)
 {
 	BITMAPINFOHEADER bi_header;
 	HBITMAP dib_bitmap;
@@ -76,7 +76,6 @@ void createCanvas(HWND handle, int width, int height, std::vector<unsigned char>
 	//free(surface->ldr_buffer);
 	//surface->ldr_buffer = NULL;
 
-	unsigned char* data = image.data();
 
 	window_dc = GetDC(handle);
 	memory_dc = CreateCompatibleDC(window_dc);
@@ -90,7 +89,7 @@ void createCanvas(HWND handle, int width, int height, std::vector<unsigned char>
 	bi_header.biBitCount = 32;
 	bi_header.biCompression = BI_RGB;
 	dib_bitmap = CreateDIBSection(memory_dc, (BITMAPINFO*)&bi_header,
-		DIB_RGB_COLORS, (void**)(&data),
+		DIB_RGB_COLORS, (void**)(image),
 		NULL, 0);
 	assert(dib_bitmap != NULL);
 	old_bitmap = (HBITMAP)SelectObject(memory_dc, dib_bitmap);
@@ -104,32 +103,49 @@ int main(int argc, char* argv[]){
 	initializeWindow();
 	HWND handle = createWindow("SoftwareRenderer", WIDTH, HEIGHT);
 
-	std::vector<unsigned char> image(WIDTH/2 * HEIGHT/2 * 4);
-	for (int i = 0; i < WIDTH/2; i++) {
-		for (int j = 0; j < HEIGHT/2; j++) {
-			image[(j * WIDTH/2 + i) * 4] = 200;
-			image[(j * WIDTH/2 + i) * 4 + 1] = 0;
-			image[(j * WIDTH/2 + i) * 4 + 2] = 0;
-			image[(j * WIDTH/2 + i) * 4 + 3] = 0;
+    byte *image  = new byte[WIDTH*HEIGHT*4];
+
+
+	for (int i = 0; i < WIDTH; i++) {
+		for (int j = 0; j < HEIGHT; j++) {
+			image[(j * WIDTH + i) * 4] = 200;    // b
+			image[(j * WIDTH + i) * 4 + 1] = 100;  // g
+			image[(j * WIDTH + i) * 4 + 2] = 0;  // r
+            image[(j * WIDTH + i) * 4 + 3] = 255;  // a
 		}
 	}
+
+    byte **p = &image;
 
 
 
 	HDC memoryDC;
-	createCanvas(handle, WIDTH/2, HEIGHT/2, image, memoryDC);
+	createCanvas(handle, WIDTH, HEIGHT, p, memoryDC);
 	SetProp(handle, WINDOW_ENTRY_NAME, handle);
 	ShowWindow(handle, SW_SHOW);
 
 
 
-
+    int changeColor = 0;
 
 	while (true)
 	{
+        int r = (changeColor/10) %255;
+        int g = (changeColor/10 +255/3) %255;
+        int b = (changeColor/10+255/3 *2) %255;
 		HDC window_dc = GetDC(handle);
-		BitBlt(window_dc, 0, 0, WIDTH/2, HEIGHT/2, memoryDC, 0, 0, SRCCOPY);
-		ReleaseDC(handle, window_dc);
+		BitBlt(window_dc, 0, 0, WIDTH, HEIGHT, memoryDC, 0, 0, SRCCOPY);
+
+        for (int i = 0; i < WIDTH; i++) {
+            for (int j = 0; j < HEIGHT; j++) {
+                image[(j * WIDTH + i) * 4] = r;
+                image[(j * WIDTH + i) * 4 + 1] = g;
+                image[(j * WIDTH + i) * 4 + 2] = b;
+                image[(j * WIDTH + i) * 4 + 3] = 255;  // a
+            }
+        }
+        
+        ReleaseDC(handle, window_dc);
 
 		UpdateWindow(handle);
 
@@ -138,6 +154,8 @@ int main(int argc, char* argv[]){
 			TranslateMessage(&message);
 			DispatchMessage(&message);
 		}
+
+        changeColor++;
 	}
 
 	RemoveProp(handle, WINDOW_ENTRY_NAME);
