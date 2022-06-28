@@ -40,6 +40,6 @@
 - 材质查看器
 
 - 参考
-  - https://zauonlok.github.io/renderer/
-  - https://www.zhihu.com/question/24786878
-  - https://zhuanlan.zhihu.com/p/372125256
+  - [纯C的软渲](https://zauonlok.github.io/renderer/)
+  - [如何开始用 C++ 写一个光栅化渲染器](https://www.zhihu.com/question/24786878)
+  - [从零手写游戏引擎6：接入渲染API](https://zhuanlan.zhihu.com/p/372125256)
