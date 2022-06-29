@@ -7,6 +7,7 @@ set(HEADER
 )
 set(SOURCES
     SoftwareRenderer/main.cpp
+    SoftwareRenderer/tools/Timer.cpp
 )
 
 add_executable(SoftwareRenderer ${SOURCES})

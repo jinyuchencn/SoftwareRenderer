@@ -14,6 +14,14 @@ static const int HEIGHT = 600;
 static const char* const WINDOW_CLASS_NAME = "Class";
 static const char* const WINDOW_ENTRY_NAME = "Entry";
 
+static std::vector<byte> RED = {255,0,0,255};
+static std::vector<byte> ORANGE = {255,165,0,255}; 
+static std::vector<byte> YELLOE = {255,255,0,255};
+static std::vector<byte> GREEN = {0,255,0,255};
+static std::vector<byte> BLUEGREEN = {0,127,255,255};
+static std::vector<byte> BLUE = {0,0,255,255};
+static std::vector<byte> PURPLE = {139,0,255,255};
+
 LRESULT CALLBACK process_message(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 void registerClass() {
@@ -63,6 +71,15 @@ HWND createWindow(const std::string title,int WIDTH,int HEIGHT) {
 	return handle;
 }
 
+
+void setPixel(byte* source,int index,std::vector<byte> color )
+{
+	source[index] = color[2];                    // b
+	source[index + 1] = color[1];				 // g
+	source[index + 2] = color[0];				 // r
+	source[index + 3] = color[3];				 // a
+}
+
 void createCanvas(HWND handle, int width, int height, byte** image, HDC &memoryDC)
 {
 	BITMAPINFOHEADER bi_header;
@@ -101,10 +118,12 @@ void createCanvas(HWND handle, int width, int height, byte** image, HDC &memoryD
 
 int main(int argc, char* argv[]){
 	initializeWindow();
+	
 	HWND handle = createWindow("SoftwareRenderer", WIDTH, HEIGHT);
 
-    byte *image  = new byte[WIDTH*HEIGHT*4];
+	std::vector<byte> image = std::vector<byte>(WIDTH*HEIGHT*4,0);
 
+	
 
 	for (int i = 0; i < WIDTH; i++) {
 		for (int j = 0; j < HEIGHT; j++) {
@@ -115,7 +134,8 @@ int main(int argc, char* argv[]){
 		}
 	}
 
-    byte **p = &image;
+	byte *image_p = image.data();
+    byte **p = &image_p;
 
 
 
@@ -128,22 +148,50 @@ int main(int argc, char* argv[]){
 
     int changeColor = 0;
 
+	int index1 = HEIGHT/7;
+	int index2 = HEIGHT/7 * 2;
+	int index3 = HEIGHT/7 * 3;
+	int index4 = HEIGHT/7 * 4;
+	int index5 = HEIGHT/7 * 5;
+	int index6 = HEIGHT/7 * 6;
+
 	while (true)
 	{
-        int r = (changeColor/10) %255;
-        int g = (changeColor/10 +255/3) %255;
-        int b = (changeColor/10+255/3 *2) %255;
-		HDC window_dc = GetDC(handle);
-		BitBlt(window_dc, 0, 0, WIDTH, HEIGHT, memoryDC, 0, 0, SRCCOPY);
 
         for (int i = 0; i < WIDTH; i++) {
             for (int j = 0; j < HEIGHT; j++) {
-                image[(j * WIDTH + i) * 4] = r;
-                image[(j * WIDTH + i) * 4 + 1] = g;
-                image[(j * WIDTH + i) * 4 + 2] = b;
-                image[(j * WIDTH + i) * 4 + 3] = 255;  // a
+
+
+				// image_p[(j * WIDTH + i)*4] = RED[2];                    // b
+				// image_p[(j * WIDTH + i)*4 + 1] = RED[1];				 // g
+				// image_p[(j * WIDTH + i)*4 + 2] = RED[0];				 // r
+				// image_p[(j * WIDTH + i)*4 + 3] = RED[3];				 // a
+
+
+				// setPixel(image,(j * WIDTH + i) * 4,RED);
+				if(j<=index1) setPixel(image_p,(j * WIDTH + i) * 4,RED);
+				else if(j<=index2) setPixel(image_p,(j * WIDTH + i) * 4,ORANGE);
+				else if(j<=index3) setPixel(image_p,(j * WIDTH + i) * 4,YELLOE);
+				else if(j<=index4) setPixel(image_p,(j * WIDTH + i) * 4,GREEN);
+				else if(j<=index5) setPixel(image_p,(j * WIDTH + i) * 4,BLUEGREEN);
+				else if(j<=index6) setPixel(image_p,(j * WIDTH + i) * 4,BLUE);
+				else  setPixel(image_p,(j * WIDTH + i) * 4,PURPLE);
+
             }
         }
+
+		HDC window_dc = GetDC(handle);
+		BitBlt(window_dc, 0, 0, WIDTH, HEIGHT, memoryDC, 0, 0, SRCCOPY);
+
+		// int index0 = 0 ;
+		int index1 = HEIGHT/7 ;
+		int index2 = HEIGHT/7 * 2 ;
+		int index3 = HEIGHT/7 * 3 ;
+		int index4 = HEIGHT/7 * 4 ;
+		int index5 = HEIGHT/7 * 5 ;
+		int index6 = HEIGHT/7 * 6 ;
+
+
         
         ReleaseDC(handle, window_dc);
 
