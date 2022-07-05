@@ -1,3 +1,6 @@
+#pragma clang diagnostic ignored "-Wunused-variable"
+#pragma clang diagnostic ignored "-Wunused-but-set-variable"
+
 #include<iostream>
 #include <tchar.h>
 #include <windows.h>
@@ -7,9 +10,10 @@
 #define UNUSED_VAR(x) ((void)(x))
 
 static int g_initialized = 0;
+static bool g_window_should_close = false;
 
-static const int WIDTH = 800;
-static const int HEIGHT = 600;
+static const int WIDTH = 200;
+static const int HEIGHT = 21;
 
 static const char* const WINDOW_CLASS_NAME = "Class";
 static const char* const WINDOW_ENTRY_NAME = "Entry";
@@ -72,7 +76,7 @@ HWND createWindow(const std::string title,int WIDTH,int HEIGHT) {
 }
 
 
-void setPixel(byte* source,int index,std::vector<byte> color )
+void setPixel(byte* source,int index,std::vector<byte> &color )
 {
 	source[index] = color[2];                    // b
 	source[index + 1] = color[1];				 // g
@@ -123,16 +127,6 @@ int main(int argc, char* argv[]){
 
 	std::vector<byte> image = std::vector<byte>(WIDTH*HEIGHT*4,0);
 
-	
-
-	for (int i = 0; i < WIDTH; i++) {
-		for (int j = 0; j < HEIGHT; j++) {
-			image[(j * WIDTH + i) * 4] = 200;    // b
-			image[(j * WIDTH + i) * 4 + 1] = 100;  // g
-			image[(j * WIDTH + i) * 4 + 2] = 0;  // r
-            image[(j * WIDTH + i) * 4 + 3] = 255;  // a
-		}
-	}
 
 	byte *image_p = image.data();
     byte **p = &image_p;
@@ -155,9 +149,10 @@ int main(int argc, char* argv[]){
 	int index5 = HEIGHT/7 * 5;
 	int index6 = HEIGHT/7 * 6;
 
-	while (true)
+	while (!g_window_should_close)
 	{
-
+		int a = 0;
+		// update buffer
         for (int i = 0; i < WIDTH; i++) {
             for (int j = 0; j < HEIGHT; j++) {
 
@@ -182,15 +177,6 @@ int main(int argc, char* argv[]){
 
 		HDC window_dc = GetDC(handle);
 		BitBlt(window_dc, 0, 0, WIDTH, HEIGHT, memoryDC, 0, 0, SRCCOPY);
-
-		// int index0 = 0 ;
-		int index1 = HEIGHT/7 ;
-		int index2 = HEIGHT/7 * 2 ;
-		int index3 = HEIGHT/7 * 3 ;
-		int index4 = HEIGHT/7 * 4 ;
-		int index5 = HEIGHT/7 * 5 ;
-		int index6 = HEIGHT/7 * 6 ;
-
 
         
         ReleaseDC(handle, window_dc);
@@ -229,6 +215,9 @@ LRESULT CALLBACK process_message(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
 	}
 	case WM_DESTROY:
 		PostQuitMessage(0);
+		break;
+	case WM_CLOSE:
+		g_window_should_close = true;
 		break;
 	default:
 		return DefWindowProc(hWnd, message, wParam, lParam);

@@ -8,6 +8,7 @@ set(HEADER
 set(SOURCES
     SoftwareRenderer/main.cpp
     SoftwareRenderer/tools/Timer.cpp
+    SoftwareRenderer/rasterizer/Rasterizer.cpp
 )
 
 add_executable(SoftwareRenderer ${SOURCES})
