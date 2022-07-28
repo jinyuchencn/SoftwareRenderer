@@ -1,22 +1,24 @@
-#pragma clang diagnostic ignored "-Wunused-variable"
-#pragma clang diagnostic ignored "-Wunused-but-set-variable"
+
 
 #include<iostream>
 #include <tchar.h>
-#include <windows.h>
-#include <assert.h>
 #include <vector>
+#include <initializer_list>
 
-#define UNUSED_VAR(x) ((void)(x))
+#include "platform/Windows.h"
+#include "tools/Math.h"
 
-static int g_initialized = 0;
-static bool g_window_should_close = false;
+
+
+bool g_window_should_close = false;
+int g_initialized = 0;
+const char* const WINDOW_CLASS_NAME = "Class";
+const char* const WINDOW_ENTRY_NAME = "Entry";
 
 static const int WIDTH = 200;
 static const int HEIGHT = 21;
 
-static const char* const WINDOW_CLASS_NAME = "Class";
-static const char* const WINDOW_ENTRY_NAME = "Entry";
+
 
 static std::vector<byte> RED = {255,0,0,255};
 static std::vector<byte> ORANGE = {255,165,0,255}; 
@@ -26,55 +28,17 @@ static std::vector<byte> BLUEGREEN = {0,127,255,255};
 static std::vector<byte> BLUE = {0,0,255,255};
 static std::vector<byte> PURPLE = {139,0,255,255};
 
-LRESULT CALLBACK process_message(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
-
-void registerClass() {
-	ATOM class_atom;
-	WNDCLASS window_class;
-	window_class.style = CS_HREDRAW | CS_VREDRAW;
-	window_class.lpfnWndProc = process_message;
-	window_class.cbClsExtra = 0;
-	window_class.cbWndExtra = 0;
-	window_class.hInstance = GetModuleHandle(NULL);
-	window_class.hIcon = LoadIcon(NULL, IDI_APPLICATION);
-	window_class.hCursor = LoadCursor(NULL, IDC_ARROW);
-	window_class.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);
-	window_class.lpszMenuName = NULL;
-	window_class.lpszClassName = WINDOW_CLASS_NAME;
-	class_atom = RegisterClass(&window_class);
-	assert(class_atom != 0);
-	UNUSED_VAR(class_atom);
+template<typename T>
+void myPrint(const T &t){
+	std::cout<<t<<std::endl;
 }
 
-void initializeWindow() {
-	assert(g_initialized == 0);
-	registerClass();
-	g_initialized = 1;
-
+template<typename T,typename...Args>
+void myPrint(const T &t, const Args&...rest)
+{
+	std::cout<<t<<" ";
+	myPrint(rest...);
 }
-
-HWND createWindow(const std::string title,int WIDTH,int HEIGHT) {
-	DWORD style = WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX;
-	RECT rect;
-	HWND handle;
-
-	rect.left = 0;
-	rect.top = 0;
-	rect.right = WIDTH;
-	rect.bottom = HEIGHT;
-
-	AdjustWindowRect(&rect, style, 0);
-
-	int newWidth = rect.right - rect.left;
-	int newHeight = rect.bottom - rect.top;
-
-	handle = CreateWindow(WINDOW_CLASS_NAME, title.c_str(), style,
-		CW_USEDEFAULT, CW_USEDEFAULT, newWidth, newHeight,
-		NULL, NULL, GetModuleHandle(NULL), NULL);
-	assert(handle != NULL);
-	return handle;
-}
-
 
 void setPixel(byte* source,int index,std::vector<byte> &color )
 {
@@ -82,42 +46,6 @@ void setPixel(byte* source,int index,std::vector<byte> &color )
 	source[index + 1] = color[1];				 // g
 	source[index + 2] = color[0];				 // r
 	source[index + 3] = color[3];				 // a
-}
-
-void createCanvas(HWND handle, int width, int height, byte** image, HDC &memoryDC)
-{
-	BITMAPINFOHEADER bi_header;
-	HBITMAP dib_bitmap;
-	HBITMAP old_bitmap;
-	HDC window_dc;
-	HDC memory_dc;
-
-	//image_t* surface;
-	//surface = image_create(width, height, 4, FORMAT_LDR);
-	//free(surface->ldr_buffer);
-	//surface->ldr_buffer = NULL;
-
-
-	window_dc = GetDC(handle);
-	memory_dc = CreateCompatibleDC(window_dc);
-	ReleaseDC(handle, window_dc);
-
-	memset(&bi_header, 0, sizeof(BITMAPINFOHEADER));
-	bi_header.biSize = sizeof(BITMAPINFOHEADER);
-	bi_header.biWidth = width;
-	bi_header.biHeight = -height;  /* top-down */
-	bi_header.biPlanes = 1;
-	bi_header.biBitCount = 32;
-	bi_header.biCompression = BI_RGB;
-	dib_bitmap = CreateDIBSection(memory_dc, (BITMAPINFO*)&bi_header,
-		DIB_RGB_COLORS, (void**)(image),
-		NULL, 0);
-	assert(dib_bitmap != NULL);
-	old_bitmap = (HBITMAP)SelectObject(memory_dc, dib_bitmap);
-	DeleteObject(old_bitmap);
-
-	memoryDC = memory_dc;
-
 }
 
 int main(int argc, char* argv[]){
@@ -142,7 +70,7 @@ int main(int argc, char* argv[]){
 
     int changeColor = 0;
 
-	int index1 = HEIGHT/7;
+	int index1 = HEIGHT/7; 
 	int index2 = HEIGHT/7 * 2;
 	int index3 = HEIGHT/7 * 3;
 	int index4 = HEIGHT/7 * 4;
@@ -151,19 +79,10 @@ int main(int argc, char* argv[]){
 
 	while (!g_window_should_close)
 	{
-		int a = 0;
 		// update buffer
         for (int i = 0; i < WIDTH; i++) {
             for (int j = 0; j < HEIGHT; j++) {
 
-
-				// image_p[(j * WIDTH + i)*4] = RED[2];                    // b
-				// image_p[(j * WIDTH + i)*4 + 1] = RED[1];				 // g
-				// image_p[(j * WIDTH + i)*4 + 2] = RED[0];				 // r
-				// image_p[(j * WIDTH + i)*4 + 3] = RED[3];				 // a
-
-
-				// setPixel(image,(j * WIDTH + i) * 4,RED);
 				if(j<=index1) setPixel(image_p,(j * WIDTH + i) * 4,RED);
 				else if(j<=index2) setPixel(image_p,(j * WIDTH + i) * 4,ORANGE);
 				else if(j<=index3) setPixel(image_p,(j * WIDTH + i) * 4,YELLOE);
@@ -174,15 +93,10 @@ int main(int argc, char* argv[]){
 
             }
         }
-
 		HDC window_dc = GetDC(handle);
-		BitBlt(window_dc, 0, 0, WIDTH, HEIGHT, memoryDC, 0, 0, SRCCOPY);
-
-        
+		BitBlt(window_dc, 0, 0, WIDTH, HEIGHT, memoryDC, 0, 0, SRCCOPY);        
         ReleaseDC(handle, window_dc);
-
 		UpdateWindow(handle);
-
 		MSG message;
 		while (PeekMessage(&message, NULL, 0, 0, PM_REMOVE)) {
 			TranslateMessage(&message);
@@ -195,34 +109,10 @@ int main(int argc, char* argv[]){
 	RemoveProp(handle, WINDOW_ENTRY_NAME);
 	DeleteDC(memoryDC);
 	DestroyWindow(handle);
+	myPrint("test",3);
+	
 
 	return 0;
 
 }
 
-LRESULT CALLBACK process_message(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
-{
-	PAINTSTRUCT ps;
-	HDC hdc;
-	TCHAR greeting[] = _T("Hello, Windows desktop!");
-
-	switch (message)
-	{
-	case WM_PAINT: {
-		hdc = BeginPaint(hWnd, &ps);
-		EndPaint(hWnd, &ps);
-		break;
-	}
-	case WM_DESTROY:
-		PostQuitMessage(0);
-		break;
-	case WM_CLOSE:
-		g_window_should_close = true;
-		break;
-	default:
-		return DefWindowProc(hWnd, message, wParam, lParam);
-		break;
-	}
-
-	return 0;
-}
