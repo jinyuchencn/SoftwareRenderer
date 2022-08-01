@@ -43,3 +43,5 @@
   - [纯C的软渲](https://zauonlok.github.io/renderer/)
   - [如何开始用 C++ 写一个光栅化渲染器](https://www.zhihu.com/question/24786878)
   - [从零手写游戏引擎6：接入渲染API](https://zhuanlan.zhihu.com/p/372125256)
+  - [~~21天精通光线追踪~~](https://github.com/RayTracing/raytracing.github.io)
+  - [PBR](https://www.pbr-book.org/3ed-2018/contents)
