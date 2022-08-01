@@ -1,6 +1,6 @@
 #include "Math.h"
 
-#include <vector>
+
 
 // vec3
 std::ostream& operator<<(std::ostream &out,const Vec3 &v)
@@ -26,7 +26,7 @@ Vec3 operator*(double t,const Vec3 &r){
 }
 
 Vec3 operator*(const Vec3 &l,double t){
-    return l*t;
+    return Vec3(t*l[0],t*l[1],t*l[2]);
 }
 
 Vec3 operator/(const Vec3 &l,double t){
@@ -49,8 +49,9 @@ Vec3 unit_vector(Vec3 v){
 
 // color
 
-std::vector<unsigned char> toRGBAColor(const Vec3 &pixelColor){
-    return std::vector<unsigned char>{static_cast<unsigned char>(255.999 * pixelColor[0]),
-    static_cast<unsigned char>(255.999 * pixelColor[1]),
-    static_cast<unsigned char>(255.999 * pixelColor[2]),255};
+std::vector<unsigned char> toRGBAColor(const Vec3 &pixelColor,unsigned char alpha){
+    return std::vector<unsigned char>{  static_cast<unsigned char>(255.999 * pixelColor[0]),
+                                        static_cast<unsigned char>(255.999 * pixelColor[1]),
+                                        static_cast<unsigned char>(255.999 * pixelColor[2]),
+                                        alpha};
 }

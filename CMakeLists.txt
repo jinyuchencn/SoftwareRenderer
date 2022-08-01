@@ -8,6 +8,7 @@ set(HEADER
 set(SOURCES
     SoftwareRenderer/main.cpp
     SoftwareRenderer/tools/Timer.cpp
+    SoftwareRenderer/tools/Math.cpp
     SoftwareRenderer/rasterizer/Rasterizer.cpp
     SoftwareRenderer/platform/windows.cpp
 )

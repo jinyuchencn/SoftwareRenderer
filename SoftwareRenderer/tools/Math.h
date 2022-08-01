@@ -1,5 +1,6 @@
 #pragma once
 #include <cmath>
+#include <vector>
 #include <assert.h>
 #include <ostream>
 class Vec3{
@@ -48,7 +49,21 @@ private:
     double array[3];
 };
 
+// vec3
+std::ostream& operator<<(std::ostream &out,const Vec3 &v);
+Vec3 operator+(const Vec3 &l,const Vec3 &r);
+Vec3 operator-(const Vec3 &l,const Vec3 &r);
+Vec3 operator*(const Vec3 &l,const Vec3 &r);
+Vec3 operator*(double t,const Vec3 &r);
+Vec3 operator*(const Vec3 &l,double t);
+Vec3 operator/(const Vec3 &l,double t);
+double dot(const Vec3 &l,const Vec3 &r);
+Vec3 cross(const Vec3 &l,const Vec3 &r);
+Vec3 unit_vector(Vec3 v);
 
+// color
+
+std::vector<unsigned char> toRGBAColor(const Vec3 &pixelColor, unsigned char alpha = 255);
 
 using Point3 = Vec3;
 using Color = Vec3;
